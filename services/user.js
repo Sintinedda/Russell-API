@@ -5,12 +5,11 @@ const jwt = require('jsonwebtoken');
 exports.authenticate = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
-    console.log(email);
-    console.log(password);
     try {
         let user = await User.findOne({ email }, '-__V -createdAt -updatedAt');
 
         if (user) {
+            let userId = user._id;
             bcrypt.compare(password, user.password, function(err, response) {
                 if (err) {
                     throw new Error(err);
@@ -27,9 +26,9 @@ exports.authenticate = async (req, res, next) => {
                         expiresIn: expireIn 
                     }
                 );
-                res.header('Authorization', 'Bearer ' + token);
+                res.cookie('token', token, {httpOnly: true, secure: true});
 
-                return res.status(200).json('authentification_reussie');
+                return res.redirect('/users/' + userId);
                 }
 
                 return res.status(403).json('echec_authentification');
@@ -49,7 +48,10 @@ exports.getById = async (req, res, next) => {
         let user = await User.findById(id);
 
         if (user) {
-            return res.status(200).json(user);
+            return res.render('userboard.ejs', {
+                title: 'Tableau de bord utilisateur',
+                user: user
+            });
         }
         return res.status(404).json('utilisateur_introuvable');
     } catch (error) {

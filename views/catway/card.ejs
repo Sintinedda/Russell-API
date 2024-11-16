@@ -1,0 +1,77 @@
+<h2>Catway numéro <%= catway.catwayNumber %></h2>
+
+<p><strong>Type : </strong><%= catway.type %></p>
+<p><strong>État : </strong><%= catway.catwayState %></p>
+
+<div>
+    <input type="button" value="Modifier" onclick="showForm('patch')">
+    <p>Si vous voulez changer l'état du catway ou son type.</p>
+    <div id="patch" style="display: none;">
+        <form action="/catways/<%= catway._id %>" method="post">
+            <fieldset>
+                <legend>Modifier le catway numéro <%= catway.catwayNumber %></legend>
+                <br>
+                <label for="type">Type</label>
+                <select name="type">
+                    <option value="short">Short</option>
+                    <option value="long">Long</option>
+                </select>
+                <br><br>
+                <label for="catwayState">État</label>
+                <textarea name="catwayState" placeholder=" <%= catway.catwayState %>"></textarea>
+                <br><br>
+                <input type="hidden" name="_method" value="PATCH">
+                <input type="submit" value="Modifier">
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+<div>
+    <input type="button" value="Remplacer" onclick="showForm('put')">
+    <p>Si vous voulez remplacer entièrement ce catway.</p>
+    <div id="put" style="display: none;">
+        <form action="/catways/<%= catway._id %>" method="post">
+            <fieldset>
+                <legend>Remplacer le catway numéro <%= catway.catwayNumber %></legend>
+                <br>
+                <label for="catwayNumber">Numéro</label>
+                <input type="number" name="catwayNumber" min="1">
+                <label for="type">Type</label>
+                <select name="type">
+                    <option value="short">Short</option>
+                    <option value="long">Long</option>
+                </select>
+                <br><br>
+                <label for="catwayState">État</label>
+                <textarea name="catwayState" placeholder="<%= catway.catwayState %>"></textarea>
+                <br><br>
+                <input type="hidden" name="_method" value="PUT">
+                <input type="submit" value="Remplacer">
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+<div>
+    <form action="/catways/<%= catway._id %>" method="post">
+        <fieldset>
+            <legend>Supprimer le catway</legend>
+            <br>
+            <p>Attention cette action est irreversible</p>
+            <br><br>
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="Supprimer">
+        </fieldset>
+    </form>
+</div>
+
+<script>
+    function showForm(id) {
+  if (document.getElementById(id).style.display == 'none') {
+       document.getElementById(id).style.display = 'block';
+     } else {
+       document.getElementById(id).style.display = 'none';
+     }
+}
+</script>
