@@ -1,9 +1,9 @@
-<h2>Catway numéro <%= catway.catwayNumber %></h2>
+<h2>Le catway numéro <%= catway.catwayNumber %> a bien <%= temp %>.</h2>
 <br><br>
 <p><strong>Type : </strong><%= catway.type %></p>
 <p><strong>État : </strong><%= catway.catwayState %></p>
 <p><strong>Id : </strong><%= catway._id %></p>
 <p><strong>Date de création : </strong><%= catway.createdAt %></p>
-<p><strong>Date de dernière modification : </strong><%= catway.updatedAt %></p>
-<br><br>
+<p><strong>Date de modification : </strong><%= catway.updatedAt %></p>
+<br>
 <input type="button" value="Retour" onclick="history.back()">

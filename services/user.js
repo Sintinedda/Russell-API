@@ -28,7 +28,7 @@ exports.authenticate = async (req, res, next) => {
                 );
                 res.cookie('token', token, {httpOnly: true, secure: true});
 
-                return res.redirect('/users/' + userId);
+                return res.redirect('/users/' + userId + '/userboard');
                 }
 
                 return res.status(403).json('echec_authentification');
@@ -41,6 +41,37 @@ exports.authenticate = async (req, res, next) => {
     }
 }
 
+exports.userBoard = async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        let user = await User.findById(id);
+        
+        if (user) {
+            return res.render('user/userboard.ejs', {
+                title: 'Tableau de bord utilisateur',
+                user: user  
+            });
+        }
+        return res.status(404).json('utilisateur_introuvable');
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+
+exports.list = async (req, res, next) => {
+    const users = await User.find();
+
+    try {
+        return res.render('user/list.ejs', {
+            users: users,
+            title: 'Liste des utilisateurs'
+        });
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+
 exports.getById = async (req, res, next) => {
     const id = req.params.id;
 
@@ -48,9 +79,9 @@ exports.getById = async (req, res, next) => {
         let user = await User.findById(id);
 
         if (user) {
-            return res.render('userboard.ejs', {
-                title: 'Tableau de bord utilisateur',
-                user: user
+            return res.render('user/card.ejs', {
+                user: user,
+                title: 'Fiche utilisateur'
             });
         }
         return res.status(404).json('utilisateur_introuvable');
@@ -69,7 +100,9 @@ exports.add = async (req, res, next) => {
     try {
         let user = await User.create(temp);
 
-        return res.status(201).json(user);
+        return res.render('user/afteradd.ejs', {
+            user: user,
+        });
     } catch (error) {
         return res.status(501).json(error);
     }
@@ -94,7 +127,10 @@ exports.update = async (req, res, next) => {
             });
 
             await user.save();
-            return res.status(201).json(user);
+
+            return res.render('user/afterupdate.ejs', {
+                user: user
+            });
         }
         return res.status(404).json('utilisateur_introuvable');
     } catch (error) {
@@ -108,7 +144,7 @@ exports.delete = async (req, res, next) => {
     try {
         await User.deleteOne({_id: id});
 
-        return res.status(204).json('utilisateur_supprime');
+        return res.render('user/afterdelete.ejs');
     } catch (error) {
         return res.status(501).json(error);
     }

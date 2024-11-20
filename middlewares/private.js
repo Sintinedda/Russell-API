@@ -7,13 +7,13 @@ exports.checkJWT = async (req, res, next) => {
     if (token) {
         jwt.verify(token, SECRET_KEY, (err, decoded) => {
             if (err) {
-                return res.status(401).json('token_invalide');
+                return res.redirect('/');
             } else {
 
             next();
             }
         });
     } else {
-        return res.status(401).json('token_requis');
+        return res.redirect('/');
     }
 }

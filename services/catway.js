@@ -24,7 +24,7 @@ exports.getById = async (req, res, next) => {
                 title: 'Fiche catway'
             });
         }
-        return escapeRegExp.status(404).json('catway_introuvable');
+        return res.status(404).json('catway_introuvable');
     } catch (error) {
         return res.status(501).json(error)
     }
@@ -39,9 +39,10 @@ exports.add = async (req, res, next) => {
 
     try {
         let catway = await Catway.create(temp);
-        console.log(catway);
 
-        return res.redirect('/catways');
+        return res.render('catway/afteradd.ejs', {
+            catway: catway
+        });
     } catch (error) {
         return res.status(501).json(error)
     }
@@ -50,7 +51,6 @@ exports.add = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     const id = req.params.id;
     const temp = ({
-        type: req.body.type,
         catwayState: req.body.catwayState
     });
 
@@ -65,7 +65,11 @@ exports.update = async (req, res, next) => {
             });
 
             await catway.save();
-            return res.redirect('/catways/' + id);
+            let temp2 = "été modifié";
+            return res.render('catway/afterupdate.ejs', {
+                catway: catway,
+                temp: temp2
+            });
         }
         return res.status(404).json('catway_introuvable');
     } catch (error) {
@@ -83,6 +87,7 @@ exports.replace = async (req, res, next) => {
 
     try {
         let catway = await Catway.findOne({_id: id});
+        let catwayNumb = catway.catwayNumber;
 
         if (catway) {
             Object.keys(temp).forEach((key) => {
@@ -92,7 +97,12 @@ exports.replace = async (req, res, next) => {
             });
 
             await catway.save();
-            return res.redirect('/catways/' + id);
+            let temp2 = "remplacé le catway numéro " + catwayNumb;
+            return res.render('catway/afterupdate.ejs', {
+                catway: catway,
+                temp: temp2
+            }
+            );
         }
         return res.status(404).json('catway_introuvable');
     } catch (error) {
@@ -106,8 +116,23 @@ exports.delete = async (req, res, next) => {
     try {
          await Catway.deleteOne({_id: id});
 
-         return res.redirect('/catways');
+         return res.render('catway/afterdelete.ejs');
     } catch (error) {
-        return res.status(501).json(error)
+        return res.status(501).json(error);
+    }
+}
+
+exports.searchReservationsByCatway = async (req, res, next) => {
+    const catwayNumber = req.body.catwayNumber;
+    try {
+        let catway = await Catway.findOne({catwayNumber: catwayNumber});
+
+        if (catway) {
+            return res.redirect('/catways/' + catway._id + '/reservations');
+        }
+
+        return res.status(404).json('catway_introuvable');
+    } catch (error) {
+        return res.status(501).json(error);
     }
 }
