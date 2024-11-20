@@ -1,9 +1,11 @@
 <h2>Liste des catways</h2>
-<p>Intéragissez avec un des catways ou bien ajouter-en un à l'aide du formulaire.</p>
+<p>Intéragir avec un catway.</p>
 <br><br>
 <table>
     <thead>
         <tr>
+            <th></th>
+            <th>Id</th>
             <th>Numéro</th>
             <th>Type</th>
             <th>État</th>
@@ -11,28 +13,15 @@
     </thead>
     <tbody>
         <% catways.forEach(function(catway) {%>
-            <td><a href="/catways/<%= catway._id %>"><input type="button" value="Numéro <%= catway.catwayNumber %>"></a></td>
-            <td><%= catway.type %></td>
-            <td><%= catway.catwayState %></td>
+            <tr>
+                <td><a href="/catways/<%= catway._id %>"><input type="button" value="Afficher"></a></td>
+                <td><%= catway._id %></td>
+                <td><%= catway.catwayNumber %></td>
+                <td><%= catway.type %></td>
+                <td><%= catway.catwayState %></td>
+            </tr>
         <% }) %>
     </tbody>
-</table><br><br>
-
-<form action="/catways" method="post">
-    <fieldset>
-        <legend>Ajouter un catway</legend>
-        <br>
-        <label for="catwayNumber">Numéro</label>
-        <input type="number" name="catwayNumber" min="1">
-        <label for="type">Type</label>
-        <select name="type">
-            <option value="short">Short</option>
-            <option value="long">Long</option>
-        </select>
-        <br><br>
-        <label for="catwayState">État</label>
-        <textarea name="catwayState"></textarea>
-        <br><br>
-        <input type="submit" value="Ajouter">
-    </fieldset>
-</form>
+</table>
+<br><br>
+<input type="button" value="Retour" onclick="history.back()">
