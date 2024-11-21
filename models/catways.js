@@ -17,6 +17,7 @@ const Catway = new Schema({
     catwayState: {
         type: String,
         trim: true,
+        required: [true, "L'état du catway doit être renseigné"]
     }
 }, {
     timestamps: true
