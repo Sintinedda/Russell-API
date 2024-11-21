@@ -6,11 +6,11 @@ exports.authenticate = async (req, res, next) => {
 
     const email = req.body.email;
     const password = req.body.password;
-
+    
     try {
 
         let user = await User.findOne({ email }, '-__V -createdAt -updatedAt');
-
+        
         if (user) {
             let userId = user._id;
             bcrypt.compare(password, user.password, function(err, response) {
@@ -160,7 +160,7 @@ exports.delete = async (req, res, next) => {
 
         await User.deleteOne({_id: id});
         return res.render('user/afterdelete.ejs');
-        
+
     } catch (error) {
         return res.status(501).json(error);
     }
