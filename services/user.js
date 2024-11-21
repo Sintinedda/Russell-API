@@ -3,20 +3,23 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.authenticate = async (req, res, next) => {
+
     const email = req.body.email;
     const password = req.body.password;
+
     try {
+
         let user = await User.findOne({ email }, '-__V -createdAt -updatedAt');
 
         if (user) {
             let userId = user._id;
             bcrypt.compare(password, user.password, function(err, response) {
+
                 if (err) {
                     throw new Error(err);
                 }
                 if (response) {
                     delete user._doc.password;
-
                     const expireIn = 2 * 60 * 60;
                     const token = jwt.sign({
                         user: user
@@ -27,24 +30,25 @@ exports.authenticate = async (req, res, next) => {
                     }
                 );
                 res.cookie('token', token, {httpOnly: true, secure: true});
-
                 return res.redirect('/users/' + userId + '/userboard');
                 }
-
                 return res.status(403).json('echec_authentification');
             });
         } else {
             return res.status(404).json('utilisateur_introuvable');
         } 
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.userBoard = async (req, res, next) => {
+
     const id = req.params.id;
 
     try {
+
         let user = await User.findById(id);
         
         if (user) {
@@ -54,28 +58,34 @@ exports.userBoard = async (req, res, next) => {
             });
         }
         return res.status(404).json('utilisateur_introuvable');
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.list = async (req, res, next) => {
+
     const users = await User.find();
 
     try {
+
         return res.render('user/list.ejs', {
             users: users,
             title: 'Liste des utilisateurs'
         });
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.getById = async (req, res, next) => {
+
     const id = req.params.id;
 
     try {
+
         let user = await User.findById(id);
 
         if (user) {
@@ -85,12 +95,14 @@ exports.getById = async (req, res, next) => {
             });
         }
         return res.status(404).json('utilisateur_introuvable');
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.add = async (req, res, next) => {
+
     const temp = ({
         name: req.body.name,
         email: req.body.email,
@@ -98,17 +110,19 @@ exports.add = async (req, res, next) => {
     });
 
     try {
-        let user = await User.create(temp);
 
+        let user = await User.create(temp);
         return res.render('user/afteradd.ejs', {
-            user: user,
+            user: user
         });
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.update = async (req, res, next) => {
+
     const id = req.params.id;
     const temp = ({
         name: req.body.name,
@@ -117,6 +131,7 @@ exports.update = async (req, res, next) => {
     });
 
     try {
+
         let user = await User.findOne({_id: id});
 
         if (user) {
@@ -125,26 +140,27 @@ exports.update = async (req, res, next) => {
                     user[key] = temp[key];
                 }
             });
-
             await user.save();
-
             return res.render('user/afterupdate.ejs', {
                 user: user
             });
         }
         return res.status(404).json('utilisateur_introuvable');
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.delete = async (req, res, next) => {
+
     const id = req.params.id;
 
     try {
-        await User.deleteOne({_id: id});
 
+        await User.deleteOne({_id: id});
         return res.render('user/afterdelete.ejs');
+        
     } catch (error) {
         return res.status(501).json(error);
     }

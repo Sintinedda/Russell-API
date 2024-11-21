@@ -2,28 +2,33 @@ const Reservation = require('../models/reservations');
 const Catway = require('../models/catways');
 
 exports.list = async (req, res, next) => {
+
     const id = req.params.id;
-    console.log(id);
-    const catway = await Catway.findById(id)
-    console.log(catway);
-    const reservations = await Reservation.find({catway: catway});
+    const catway = await Catway.findById(id);
+    const catwayNumb = catway.catwayNumber;
+    const reservations = await Reservation.find({catwayNumber: catwayNumb});
+
     try {
+
         return res.render('reservation/list.ejs', {
             catway: catway,
             reservations: reservations,
             title: 'Liste des réservations par catway' 
         });
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.getById = async (req, res, next) => {
+
     const id = req.params.id;
     const catway = await Catway.findById(id);
     const idReservation = req.params.idReservation;
 
     try {
+
         let reservation = await Reservation.findById(idReservation);
 
         if (reservation) {
@@ -34,6 +39,7 @@ exports.getById = async (req, res, next) => {
             });
         }
         return res.status(404).json('reservation_introuvable');
+
     } catch (error) {
         return res.status(501).json(error);
     }
@@ -43,64 +49,102 @@ exports.getReservationById = async (req, res, next) => {
     const reservationId = req.params.idReservation;
     
     try {
+
         let reservation = await Reservation.findById(reservationId);
-        let catwayId = reservation.catway._id;
+        let catwayNumb = reservation.catwayNumber;
+        let catway = await Catway.findOne({catwayNumber: catwayNumb});
+        let catwayId = catway._id;
 
         if (reservation) {
             return res.redirect('/catways/' + catwayId + '/reservations/' + reservationId);
         }
         return res.status(404).json(reservation_introuvable);
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.add = async (req, res, next) => {
+
     const id = req.params.id;
     const catway = await Catway.findById(id);
+    const catwayNumb = catway.catwayNumber;
     const temp = ({
-        catway: catway,
+        catwayNumber: catwayNumb,
         clientName: req.body.clientName,
         boatName: req.body.boatName,
-        checkIn: req.body.checkIn,
-        checkOut: req.body.checkOut
+        checkIn: new Date(req.body.checkIn),
+        checkOut: new Date (req.body.checkOut)
     });
 
     try {
-        let reservation = await Reservation.create(temp);
 
-        return res.render('reservation/afteradd.ejs', {
-            reservation: reservation
-        });
+        if (temp.checkIn.getTime() > Date.now() || temp.checkOut.getTime() > Date.now) {
+
+            if (temp.checkIn.getTime() < temp.checkOut.getTime()) {
+                let reservationsExists = await Reservation.find({catwayNumber: catwayNumb});
+
+                if (reservationsExists) {
+                    console.log(reservationsExists);
+
+                    for (let r=0; r < reservationsExists.length; r++) {
+                        let check1 = temp.checkIn.getTime() >= reservationsExists[r].checkIn.getTime() && temp.checkIn.getTime() <= reservationsExists[r].checkOut.getTime();
+                        let check2 = temp.checkOut.getTime() >= reservationsExists[r].checkIn.getTime() && temp.checkOut.getTime() <= reservationsExists[r].checkOut.getTime();
+                        let check3 = reservationsExists[r].checkIn.getTime() >= temp.checkIn.getTime() && reservationsExists[r].checkIn.getTime() <= temp.checkOut.getTime();
+                        console.log(reservationsExists[r]);
+
+                        if (check1 || check2 || check3) {
+                            return res.status(404).json("Les dates correspondent déjà à une autre réservation");
+                        } 
+                    }
+                }
+                let reservation = await Reservation.create(temp);
+                return res.render('reservation/afteradd.ejs', {
+                    reservation: reservation
+                });
+            }
+            return res.status(404).json("La date de sortie ne peut pas être antèrieure à la date d'entrée");
+        }
+        return res.status(404).json("Les dates de réservations ne peuvent être antèrieures à aujourd'hui");
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.delete = async (req, res, next) => {
+
     const idReservation = req.params.idReservation;
 
     try {
+        
         await Reservation.deleteOne({_id: idReservation});
-
         return res.render('reservation/afterdelete.ejs');
+
     } catch (error) {
         return res.status(501).json(error);
     }
 }
 
 exports.deleteReservationById = async (req, res, next) => {
+
     const reservationId = req.params.idReservation;
     
     try {
+
         let reservation = await Reservation.findById(reservationId);
+        let catwayNumb = reservation.catwayNumber;
+        let catway = await Catway.findOne({catwayNumber: catwayNumb});
 
         if (reservation) {
             return res.render('reservation/delete.ejs', {
-                reservation: reservation
+                reservation: reservation,
+                catway: catway
             });
         }
         return res.status(404).json(reservation_introuvable);
+        
     } catch (error) {
         return res.status(501).json(error);
     }
