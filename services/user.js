@@ -10,7 +10,6 @@ exports.authenticate = async (req, res, next) => {
     try {
 
         let user = await User.findOne({ email }, '-__V -createdAt -updatedAt');
-        
         if (user) {
             let userId = user._id;
             bcrypt.compare(password, user.password, function(err, response) {
@@ -52,7 +51,7 @@ exports.userBoard = async (req, res, next) => {
         let user = await User.findById(id);
         
         if (user) {
-            return res.render('user/userboard.ejs', {
+            return res.status(200).render('user/userboard.ejs', {
                 title: 'Tableau de bord utilisateur',
                 user: user  
             });
@@ -70,7 +69,7 @@ exports.list = async (req, res, next) => {
 
     try {
 
-        return res.render('user/list.ejs', {
+        return res.status(200).render('user/list.ejs', {
             users: users,
             title: 'Liste des utilisateurs'
         });
@@ -89,7 +88,7 @@ exports.getById = async (req, res, next) => {
         let user = await User.findById(id);
 
         if (user) {
-            return res.render('user/card.ejs', {
+            return res.status(200).render('user/card.ejs', {
                 user: user,
                 title: 'Fiche utilisateur'
             });
@@ -112,7 +111,7 @@ exports.add = async (req, res, next) => {
     try {
 
         let user = await User.create(temp);
-        return res.render('user/afteradd.ejs', {
+        return res.status(201).render('user/afteradd.ejs', {
             user: user
         });
 
@@ -141,7 +140,8 @@ exports.update = async (req, res, next) => {
                 }
             });
             await user.save();
-            return res.render('user/afterupdate.ejs', {
+
+            return res.status(204).render('user/afterupdate.ejs', {
                 user: user
             });
         }
@@ -159,7 +159,7 @@ exports.delete = async (req, res, next) => {
     try {
 
         await User.deleteOne({_id: id});
-        return res.render('user/afterdelete.ejs');
+        return res.status(204).render('user/afterdelete.ejs');
 
     } catch (error) {
         return res.status(501).json(error);

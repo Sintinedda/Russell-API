@@ -1,5 +1,7 @@
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
-const URL_MONGO = process.env.URL_MONGO;
+
+const TARGET = process.env.npm_lifecycle_event;
 
 const clientOptions = {
     useNewUrlParser: true,
@@ -8,8 +10,18 @@ const clientOptions = {
 
 exports.initClientConnection = async () => {
     try {
-        await mongoose.connect(URL_MONGO, clientOptions);
-        console.log('Connexion à MongoDB réussie');
+        let database = process.env.URL_MONGO;
+        if (TARGET === 'test') {
+            const mongo = await MongoMemoryServer.create();
+            database = mongo.getUri();
+        }
+        await mongoose.connect(database, clientOptions);
+        if (TARGET === 'test') {
+            console.log('Connexion à la base de donnée test réussie');
+        }
+        else {
+            console.log('Connexion à MongoDB réussie');
+        }
     } catch (error) {
         console.error('Erreur de connexion à MongoDB : ', error);
     }

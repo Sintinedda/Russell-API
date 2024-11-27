@@ -10,7 +10,7 @@ exports.list = async (req, res, next) => {
 
     try {
 
-        return res.render('reservation/list.ejs', {
+        return res.status(200).render('reservation/list.ejs', {
             catway: catway,
             reservations: reservations,
             title: 'Liste des réservations par catway' 
@@ -32,7 +32,7 @@ exports.getById = async (req, res, next) => {
         let reservation = await Reservation.findById(idReservation);
 
         if (reservation) {
-            return res.render('reservation/card.ejs', {
+            return res.status(200).render('reservation/card.ejs', {
                 reservation: reservation,
                 catway: catway,
                 title: 'Fiche réservation'
@@ -95,18 +95,18 @@ exports.add = async (req, res, next) => {
                         console.log(reservationsExists[r]);
 
                         if (check1 || check2 || check3) {
-                            return res.status(404).json("Les dates correspondent déjà à une autre réservation");
+                            return res.status(400).json("Les dates correspondent déjà à une autre réservation");
                         } 
                     }
                 }
                 let reservation = await Reservation.create(temp);
-                return res.render('reservation/afteradd.ejs', {
+                return res.status(201).render('reservation/afteradd.ejs', {
                     reservation: reservation
                 });
             }
-            return res.status(404).json("La date de sortie ne peut pas être antèrieure à la date d'entrée");
+            return res.status(400).json("La date de sortie ne peut pas être antèrieure à la date d'entrée");
         }
-        return res.status(404).json("Les dates de réservations ne peuvent être antèrieures à aujourd'hui");
+        return res.status(400).json("Les dates de réservations ne peuvent être antèrieures à aujourd'hui");
 
     } catch (error) {
         return res.status(501).json(error);
@@ -120,7 +120,7 @@ exports.delete = async (req, res, next) => {
     try {
         
         await Reservation.deleteOne({_id: idReservation});
-        return res.render('reservation/afterdelete.ejs');
+        return res.status(204).render('reservation/afterdelete.ejs');
 
     } catch (error) {
         return res.status(501).json(error);
@@ -138,7 +138,7 @@ exports.deleteReservationById = async (req, res, next) => {
         let catway = await Catway.findOne({catwayNumber: catwayNumb});
 
         if (reservation) {
-            return res.render('reservation/delete.ejs', {
+            return res.status(204).render('reservation/delete.ejs', {
                 reservation: reservation,
                 catway: catway
             });

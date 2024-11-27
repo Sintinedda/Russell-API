@@ -14,6 +14,6 @@ exports.checkJWT = async (req, res, next) => {
             }
         });
     } else {
-        return res.redirect('/');
+        return res.redirect(404, '/');
     }
 }
