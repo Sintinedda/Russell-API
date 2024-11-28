@@ -7,13 +7,13 @@ exports.checkJWT = async (req, res, next) => {
     if (token) {
         jwt.verify(token, SECRET_KEY, (err, decoded) => {
             if (err) {
-                return res.redirect('/');
+                return res.redirect(303, '/');
             } else {
 
             next();
             }
         });
     } else {
-        return res.redirect(404, '/');
+        return res.redirect(303, '/');
     }
 }
