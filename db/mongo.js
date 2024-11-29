@@ -1,5 +1,6 @@
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
+require('dotenv').config({ path: './env/.env' });
 
 const TARGET = process.env.npm_lifecycle_event;
 
