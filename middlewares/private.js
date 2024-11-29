@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config({ path: './env/.env' });
 const SECRET_KEY = process.env.SECRET_KEY;
 
 exports.checkJWT = async (req, res, next) => {
