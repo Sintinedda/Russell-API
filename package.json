@@ -29,7 +29,9 @@
     "mongodb-memory-server-core": "^10.1.2",
     "mongoose": "^8.8.1",
     "morgan": "~1.9.1",
+    "node": "^20.18.1",
     "node-mongodb-fixtures": "^3.2.9",
+    "npm": "^10.9.1",
     "supertest": "^7.0.0"
   },
   "devDependencies": {
